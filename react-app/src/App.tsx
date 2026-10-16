@@ -1,5 +1,30 @@
+interface FilmProps {
+  name: string;
+  src: string;
+  year: number;
+}
 
-function Film(props) {
+interface KsiazkaProps {
+  name: string;
+  src: string;
+  year: number;
+  author: string;
+}
+
+interface SongProps {
+  songTitle: string;
+  duration: string;
+}
+
+interface MuzykaProps {
+  name: string;
+  src: string;
+  year: number;
+  author: string;
+  songs: SongProps[];
+}
+
+function Film(props:FilmProps) {
   return (
     <>
       <div
@@ -20,7 +45,7 @@ function Film(props) {
   );
 }
 
-function Ksiazka(props) {
+function Ksiazka(props:KsiazkaProps) {
   return (
     <>
       <div
@@ -42,7 +67,7 @@ function Ksiazka(props) {
   );
 }
 
-function Muzyka(props) {
+function Muzyka(props:MuzykaProps) {
   return (
     <>
       <div
@@ -151,14 +176,7 @@ function App() {
             { songTitle: "Nothing", duration: "2:09" },
             { songTitle: "3x", duration: "1:32" },
             { songTitle: "Boss Up", duration: "2:40" },
-            { songTitle: "Kills", duration: "4:08" },
-            // { songTitle: "Kome Thru", duration: "2:20" },
-            // { songTitle: "Me When", duration: "1:58" },
-            // { songTitle: "Uno", duration: "1:49" },
-            // { songTitle: "Str8 Flexin", duration: "1:37" },
-            // { songTitle: "Congrats", duration: "1:39" },
-            // { songTitle: "Pop", duration: "1:49" },
-            // { songTitle: "Talking 2 A Ghost", duration: "2:02" },
+            { songTitle: "Kills", duration: "4:08" }
           ]}
         />
 
@@ -173,7 +191,7 @@ function App() {
             { songTitle: "bitch face", duration: "2:05" },
             { songTitle: "ed, edd i eddie", duration: "1:53" },
             { songTitle: "dance dance dance", duration: "2:15" },
-            { songTitle: "billie", duration: "1:52" },
+            { songTitle: "billie", duration: "1:52" }
           ]}
         />
         <Muzyka
@@ -191,7 +209,7 @@ function App() {
             { songTitle: "Me N My Kup", duration: "2:38" },
             { songTitle: "It's Over", duration: "2:25" },
             { songTitle: "Succubus", duration: "2:28" },
-            { songTitle: "Paranoid", duration: "2:36" },
+            { songTitle: "Paranoid", duration: "2:36" }
         ]}
 />
       </div>

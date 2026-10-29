@@ -1,3 +1,6 @@
+import { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 interface FilmProps {
   name: string;
   src: string;
@@ -19,6 +22,10 @@ interface SongProps {
   duration: string;
 }
 
+interface UtworProps extends SongProps {
+  onSongClick: (songTitle: string) => void;
+}
+
 interface MuzykaProps {
   name: string;
   src: string;
@@ -28,113 +35,114 @@ interface MuzykaProps {
   songs: SongProps[];
 }
 
-function Utwor(props: SongProps) {
+function Utwor(props: UtworProps) {
   return (
-    <tr>
+    <tr
+      onClick={() => props.onSongClick(props.songTitle)}
+      style={{ cursor: "pointer" }}
+    >
       <td>{(props.index ?? 0) + 1}</td>
       <td>{props.songTitle}</td>
-      <td>{props.duration}</td>
+      <td className="text-end">{props.duration}</td>
     </tr>
   );
 }
 
 function Film(props: FilmProps) {
   return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "10px",
-          border: "1px solid black",
-          padding: "20px",
-        }}
-      >
-        <img src={props.src} alt={props.name} height={400} width={300} />
-        <p>{props.name}</p>
-        <p>{props.year}</p>
-        <p>Ocena: {props.rating}/10</p>
-        {props.rating >= 8 && <p>Polecany</p>}
+    <div
+      className="card h-100"
+      onClick={() => console.log(`Wybrano film: ${props.name}`)}
+    >
+      <img src={props.src} alt={props.name} className="card-img-top" />
+      <div className="card-body">
+        <h5 className="card-title">{props.name}</h5>
+        <p className="card-text">{props.year}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={(event) => {
+            event.stopPropagation();
+            console.log(`Pokaż szczegóły dla ${props.name}`);
+          }}
+        >
+          Pokaż szczegóły
+        </button>
+        <p className="card-text">Ocena: {props.rating}/10</p>
+        {props.rating >= 8 && <p className="card-text">Polecany</p>}
       </div>
-    </>
+    </div>
   );
 }
 
 function Ksiazka(props: KsiazkaProps) {
   return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "10px",
-          border: "1px solid black",
-          padding: "20px",
-        }}
-      >
-        <img src={props.src} alt={props.name} height={400} width={300} />
-        <p>{props.name}</p>
-        <p>{props.year}</p>
-        <p>{props.author}</p>
-        <p>stron: {props.pages}</p>
-        {props.year < 2000 && <p>Klasyka</p>}
+    <div className="card h-100">
+      <img src={props.src} alt={props.name} className="card-img-top" />
+      <div className="card-body">
+        <h5 className="card-title">{props.name}</h5>
+        <p className="card-text">{props.year}</p>
+        <p className="card-text">{props.author}</p>
+        <p className="card-text">stron: {props.pages}</p>
+        {props.year < 2000 && <p className="card-text">Klasyka</p>}
       </div>
-    </>
+    </div>
   );
 }
 
 function Muzyka(props: MuzykaProps) {
-  return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "10px",
-          border: "1px solid black",
-          padding: "20px",
-        }}
-      >
-        <img src={props.src} alt={props.name} height={400} width={300} />
-        <p>{props.name}</p>
-        <p>{props.year}</p>
-        <p>{props.author}</p>
-        <p>{props.genre}</p>
+  function handleSongClick(songTitle: string) {
+    console.log(`Wybrano utwór: ${songTitle} z ${props.name}`);
+  }
 
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Tytuł utworu</th>
-              <th>Czas</th>
-            </tr>
-          </thead>
-          <tbody>
-            {props.songs.length === 0 ? (
+  return (
+    <div className="card h-100">
+      <img src={props.src} alt={props.name} className="card-img-top" />
+      <div className="card-body">
+        <h5 className="card-title">{props.name}</h5>
+        <p className="card-text">{props.year}</p>
+        <p className="card-text">{props.author}</p>
+        <p className="card-text">{props.genre}</p>
+
+        {props.songs.length === 0 ? (
+          <div className="alert alert-warning">Brak utworów</div>
+        ) : (
+          <table className="table table-striped table-hover">
+            <thead>
               <tr>
-                <td colSpan={3}>Brak utworów</td>
+                <th>#</th>
+                <th>Tytuł utworu</th>
+                <th className="text-end">Czas</th>
               </tr>
-            ) : (
-              props.songs.map((song, index) => (
+            </thead>
+            <tbody>
+              {props.songs.map((song, index) => (
                 <Utwor
                   key={index}
                   index={index}
                   songTitle={song.songTitle}
                   duration={song.duration}
+                  onSongClick={handleSongClick}
                 />
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
 function App() {
+  const [movieSearch, setMovieSearch] = useState("");
+  const [bookSearch, setBookSearch] = useState("");
+  const [albumSearch, setAlbumSearch] = useState("");
+  const [isMoviesOpen, setIsMoviesOpen] = useState(true);
+  const [areRecentMoviesOpen, setAreRecentMoviesOpen] = useState(true);
+  const [areBooksOpen, setAreBooksOpen] = useState(true);
+  const [areNewestBooksOpen, setAreNewestBooksOpen] = useState(true);
+  const [isMusicOpen, setIsMusicOpen] = useState(true);
+  const [isMostPopularAlbumOpen, setIsMostPopularAlbumOpen] = useState(true);
   const movies: FilmProps[] = [
     {
       name: "Harry Potter i Czara Ognia",
@@ -237,6 +245,9 @@ function App() {
   books.sort((first, second) => first.name.localeCompare(second.name));
   albums.sort((first, second) => first.name.localeCompare(second.name));
 
+  const filteredMovies = movies.filter((movie) =>
+    movie.name.toLowerCase().includes(movieSearch.toLowerCase()),
+  );
   const recentMovies = movies.filter((movie) => movie.year > 2010);
   const booksByNewest = books.slice();
   booksByNewest.sort((first, second) => second.year - first.year);
@@ -248,91 +259,188 @@ function App() {
   }
 
   return (
-    <>
-      <h1>Filmy</h1>
-
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-        {movies.map((movie) => (
-          <Film
-            key={movie.name}
-            name={movie.name}
-            src={movie.src}
-            year={movie.year}
-            rating={movie.rating}
+    <div className="container">
+      <h1
+        onClick={() => setIsMoviesOpen(!isMoviesOpen)}
+        style={{ cursor: "pointer" }}
+      >
+        {isMoviesOpen ? "▾" : "▸"} Filmy
+      </h1>
+      {isMoviesOpen && (
+        <>
+          <input
+            id="movie-search"
+            type="text"
+            className="form-control mb-3"
+            placeholder="Wpisz tytuł"
+            value={movieSearch}
+            onChange={(event) => {
+              const value = event.target.value;
+              setMovieSearch(value);
+              console.log(value);
+            }}
           />
-        ))}
-      </div>
+          <p>Wpisany tytuł filmu: {movieSearch}</p>
+          {filteredMovies.length === 0 ? (
+            <p>Nie znaleziono filmów</p>
+          ) : (
+            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+              {filteredMovies.map((movie) => (
+                <div className="col" key={movie.name}>
+                  <Film
+                    name={movie.name}
+                    src={movie.src}
+                    year={movie.year}
+                    rating={movie.rating}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
-      <h1>Filmy wydane po 2010 roku</h1>
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-        {recentMovies.map((movie) => (
-          <Film
-            key={movie.name}
-            name={movie.name}
-            src={movie.src}
-            year={movie.year}
-            rating={movie.rating}
+      <h1
+        onClick={() => setAreRecentMoviesOpen(!areRecentMoviesOpen)}
+        style={{ cursor: "pointer" }}
+      >
+        {areRecentMoviesOpen ? "▾" : "▸"} Filmy wydane po 2010 roku
+      </h1>
+      {areRecentMoviesOpen && (
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          {recentMovies.map((movie) => (
+            <div className="col" key={movie.name}>
+              <Film
+                name={movie.name}
+                src={movie.src}
+                year={movie.year}
+                rating={movie.rating}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <h1
+        onClick={() => setAreBooksOpen(!areBooksOpen)}
+        style={{ cursor: "pointer" }}
+      >
+        {areBooksOpen ? "▾" : "▸"} Książki
+      </h1>
+      {areBooksOpen && (
+        <>
+          <input
+            id="book-search"
+            type="text"
+            className="form-control mb-3"
+            placeholder="Wpisz tytuł"
+            value={bookSearch}
+            onChange={(event) => {
+              const value = event.target.value;
+              setBookSearch(value);
+              console.log(value);
+            }}
           />
-        ))}
-      </div>
+          <p>Wpisany tytuł książki: {bookSearch}</p>
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {books.map((book) => (
+              <div className="col" key={book.name}>
+                <Ksiazka
+                  name={book.name}
+                  src={book.src}
+                  year={book.year}
+                  author={book.author}
+                  pages={book.pages}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
-      <h1>Książki</h1>
+      <h1
+        onClick={() => setAreNewestBooksOpen(!areNewestBooksOpen)}
+        style={{ cursor: "pointer" }}
+      >
+        {areNewestBooksOpen ? "▾" : "▸"} Książki od najnowszej
+      </h1>
+      {areNewestBooksOpen && (
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          {booksByNewest.map((book) => (
+            <div className="col" key={book.name}>
+              <Ksiazka
+                name={book.name}
+                src={book.src}
+                year={book.year}
+                author={book.author}
+                pages={book.pages}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-        {books.map((book) => (
-          <Ksiazka
-            key={book.name}
-            name={book.name}
-            src={book.src}
-            year={book.year}
-            author={book.author}
-            pages={book.pages}
+      <h1
+        onClick={() => setIsMusicOpen(!isMusicOpen)}
+        style={{ cursor: "pointer" }}
+      >
+        {isMusicOpen ? "▾" : "▸"} Muzyka
+      </h1>
+      {isMusicOpen && (
+        <>
+          <input
+            id="album-search"
+            type="text"
+            className="form-control mb-3"
+            placeholder="Wpisz tytuł"
+            value={albumSearch}
+            onChange={(event) => {
+              const value = event.target.value;
+              setAlbumSearch(value);
+              console.log(value);
+            }}
           />
-        ))}
-      </div>
+          <p>Wpisany tytuł albumu: {albumSearch}</p>
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {albums.map((album) => (
+              <div className="col" key={album.name}>
+                <Muzyka
+                  name={album.name}
+                  src={album.src}
+                  year={album.year}
+                  author={album.author}
+                  genre={album.genre}
+                  songs={album.songs}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
-      <h1>Książki od najnowszej</h1>
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-        {booksByNewest.map((book) => (
-          <Ksiazka
-            key={book.name}
-            name={book.name}
-            src={book.src}
-            year={book.year}
-            author={book.author}
-            pages={book.pages}
-          />
-        ))}
-      </div>
-
-      <h1>Muzyka</h1>
-
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-        {albums.map((album) => (
-          <Muzyka
-            key={album.name}
-            name={album.name}
-            src={album.src}
-            year={album.year}
-            author={album.author}
-            genre={album.genre}
-            songs={album.songs}
-          />
-        ))}
-      </div>
-
-      <h1>Album z największą liczbą utworów</h1>
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-        <Muzyka
-          name={albumWithMostSongs.name}
-          src={albumWithMostSongs.src}
-          year={albumWithMostSongs.year}
-          author={albumWithMostSongs.author}
-          genre={albumWithMostSongs.genre}
-          songs={albumWithMostSongs.songs}
-        />
-      </div>
-    </>
+      <h1
+        onClick={() =>
+          setIsMostPopularAlbumOpen(!isMostPopularAlbumOpen)
+        }
+        style={{ cursor: "pointer" }}
+      >
+        {isMostPopularAlbumOpen ? "▾" : "▸"} Album z największą liczbą utworów
+      </h1>
+      {isMostPopularAlbumOpen && (
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          <div className="col">
+            <Muzyka
+              name={albumWithMostSongs.name}
+              src={albumWithMostSongs.src}
+              year={albumWithMostSongs.year}
+              author={albumWithMostSongs.author}
+              genre={albumWithMostSongs.genre}
+              songs={albumWithMostSongs.songs}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
